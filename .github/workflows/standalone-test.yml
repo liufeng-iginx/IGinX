@@ -66,6 +66,12 @@ jobs:
               with:
                   DB-name: ${{ matrix.DB-name }}
 
+            - if: runner.os == 'Windows'
+              name: Install Docker
+              shell: bash
+              run: |
+                echo ${JAVA_HOME}
+
             - name: Install IGinX with Maven
               shell: bash
               run: |
@@ -187,12 +193,19 @@ jobs:
                   work-name: restart-iginx-meta
                   metadata: ${{ matrix.metadata }}
 
+            - if: runner.os == 'Windows'
+              name: Install Docker
+              shell: bash
+              run: |
+                echo ${JAVA_HOME}
+
             - name: TestController IT
               if: always()
               shell: bash
               env:
                   METADATA_STORAGE: ${{ matrix.metadata }}
               run: |
+                  echo ${JAVA_HOME}
                   chmod +x "${GITHUB_WORKSPACE}/.github/scripts/test/test_union.sh"
                   mvn test -q -Dtest=Controller -DfailIfNoTests=false -P-format
 
