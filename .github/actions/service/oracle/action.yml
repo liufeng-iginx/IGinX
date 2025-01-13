@@ -70,7 +70,7 @@ runs:
           name: Start Oracle container
           shell: pwsh
           run: |
-            $ports = '${{ inputs.ports }}' -split ' '
+            $ports = if ('${{ inputs.ports }}' -match ' ') {'${{ inputs.ports }}' -split ' ' } else { @('${{ inputs.ports }}') }
             echo $ports
             foreach ($P in $ports) {
               docker run -d --name "${{ inputs.version }}-$P" -p $P:1521 -e ORACLE_PDB=ORCLPDB -e ORACLE_PWD=Oracle123 container-registry.oracle.com/database/free:23.5.0.0-lite    
@@ -83,7 +83,7 @@ runs:
           run: |
               docker ps
               sleep 10
-              $ports = '${{ inputs.ports }}' -split ' '
+              $ports = if ('${{ inputs.ports }}' -match ' ') {'${{ inputs.ports }}' -split ' ' } else { @('${{ inputs.ports }}') }
               foreach ($P in $ports) {
                 while true; do
                 log_output=$(docker logs "${{ inputs.version }}-$P" 2>&1 | grep -i "DATABASE IS READY TO USE" || true)
