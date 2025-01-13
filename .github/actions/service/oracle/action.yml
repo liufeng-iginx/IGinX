@@ -68,12 +68,13 @@ runs:
 #              done
         - if: runner.os == 'Windows'
           name: Start Oracle container
-          shell: cmd
+          shell: pwsh
           run: |
-              echo ${{ inputs.ports }}
-              SET values=${{ inputs.ports }}
-              for /L %%P in (values) do
-                 echo %%P
+            $ports = '${{ inputs.ports }}' -split ' '
+            echo $ports
+            foreach ($P in $ports) {
+              docker run -d --name "${{ inputs.version }}-$P" -p $P:1521 -e ORACLE_PDB=ORCLPDB -e ORACLE_PWD=Oracle123 container-registry.oracle.com/database/free:23.5.0.0-lite    
+            }
 
         - if: runner.os == 'Windows'
           name: Verify Oracle Database is running
@@ -82,16 +83,16 @@ runs:
           run: |
               docker ps
               sleep 10
-              SET values=${{ inputs.ports }}
-              for %P in (values) do
-              while true; do
-                log_output=$(docker logs "${{ inputs.version }}-%P" 2>&1 | grep -i "DATABASE IS READY TO USE" || true)
+              $ports = '${{ inputs.ports }}' -split ' '
+              foreach ($P in $ports) {
+                while true; do
+                log_output=$(docker logs "${{ inputs.version }}-$P" 2>&1 | grep -i "DATABASE IS READY TO USE" || true)
                 if [ -z "$log_output" ]; then
                   echo "orcle not stated , waitting 10 seconds..."
-                  docker logs --tail 10 ${{ inputs.version }}-%P
+                  docker logs --tail 10 ${{ inputs.version }}-$P
                   sleep 10
                 else
                   echo "orcle already stated."
                   break
                 fi
-              done
+              }
