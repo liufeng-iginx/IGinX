@@ -73,7 +73,8 @@ runs:
             $ports = if ('${{ inputs.ports }}' -match ' ') {'${{ inputs.ports }}' -split ' ' } else { @('${{ inputs.ports }}') }
             echo $ports
             foreach ($P in $ports) {
-              docker run -d --name "${{ inputs.version }}-$P" -p $P:1521 -e ORACLE_PDB=ORCLPDB -e ORACLE_PWD=Oracle123 container-registry.oracle.com/database/free:23.5.0.0-lite    
+              echo $P
+              docker run -d --name ${{ inputs.version }}-$P -p $P:1521 -e ORACLE_PDB=ORCLPDB -e ORACLE_PWD=Oracle123 container-registry.oracle.com/database/free:23.5.0.0-lite    
             }
 
         - if: runner.os == 'Windows'
