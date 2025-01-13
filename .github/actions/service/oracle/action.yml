@@ -72,8 +72,8 @@ runs:
           run: |
               echo ${{ inputs.ports }}
               SET values=${{ inputs.ports }}
-              for %P in (values) do
-                 echo %P%
+              for /L %%P in (values) do
+                 echo %%P
 
         - if: runner.os == 'Windows'
           name: Verify Oracle Database is running
