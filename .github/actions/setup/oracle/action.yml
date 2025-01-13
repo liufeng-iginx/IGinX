@@ -73,6 +73,7 @@ runs:
           uses: docker/setup-docker-action@v4
 
         - name: Run Docker command
+          shell: cmd
           run:
             docker --version
             docker pull container-registry.oracle.com/database/free:23.5.0.0-lite
