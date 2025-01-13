@@ -41,15 +41,17 @@ public class ShellRunner {
       ProcessBuilder builder = new ProcessBuilder();
       if (isOnWin()) {
         LOGGER.info("unitTest command is on path {}",isCommandOnPath("bash"));
-        builder.command((isCommandOnPath("bash") ? "bash" : BASH_PATH), command);
+//        builder.command((isCommandOnPath("bash") ? "bash" : BASH_PATH), command);
+        builder.command( BASH_PATH, command);
       } else {
         builder.command(command);
       }
-      LOGGER.info("unitTest command JAVA_HOME is {}",System.getenv("JAVA_HOME"));
-      LOGGER.info("unitTest command PATH is {}",System.getenv("PATH"));
       // Get the current environment of the ProcessBuilder
       Map<String, String> environment = builder.environment();
+      environment.forEach((key, value) -> LOGGER.info("{}-{}", key, value));
 
+      LOGGER.info("unitTest command JAVA_HOME is {}",System.getenv("JAVA_HOME"));
+      LOGGER.info("unitTest command PATH is {}",System.getenv("PATH"));
       // Explicitly set JAVA_HOME in the ProcessBuilder's environment
       environment.put("JAVA_HOME", System.getenv("JAVA_HOME"));  // Use the system's JAVA_HOME
 
