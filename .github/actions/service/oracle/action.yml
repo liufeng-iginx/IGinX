@@ -39,6 +39,13 @@ runs:
                   fi
                 done
               done
+
+        - if: runner.os == 'Windows'
+          name: Install Docker
+          shell: bash
+          run: |
+            echo ${JAVA_HOME}
+
         - if: runner.os == 'Windows'
           name: Start Oracle container
           shell: wsl-run {0}
@@ -66,3 +73,8 @@ runs:
                 fi
                 done
               done
+        - if: runner.os == 'Windows'
+          name: Install Docker
+          shell: bash
+          run: |
+            echo ${JAVA_HOME}
