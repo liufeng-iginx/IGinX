@@ -79,7 +79,7 @@ runs:
         - if: runner.os == 'Windows'
           name: Verify Oracle Database is running
           id: oracleContainerWin
-          shell: cmd
+          shell: pwsh
           run: |
               docker ps
               sleep 10
