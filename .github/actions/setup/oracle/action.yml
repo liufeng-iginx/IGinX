@@ -20,6 +20,9 @@ runs:
               sudo curl -L -o $LIMACTL_PATH https://github.com/mikekazakov/lima-nohvf/raw/master/limactl && sudo chmod +x $LIMACTL_PATH
               colima start --network-address --arch arm64 --vm-type=qemu
               docker --version
+              sysctl -n machdep.cpu.brand_string
+              top -l 1 -s 0 | grep PhysMem
+              sysctl kern.ipc.shmmax
         - if: runner.os == 'Linux' || runner.os == 'macOS'
           name: Download and Install Oracle JDBC Driver
           shell: bash
