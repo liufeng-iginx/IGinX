@@ -17,7 +17,7 @@ runs:
           shell: bash
           run: |
               for port in ${{ inputs.ports }}; do
-                 docker run -d --name ${{ inputs.version }}-$port --memory=8g --cpus=2 --shm-size=4g -p $port:1521 -e ORACLE_PDB=ORCLPDB -e ORACLE_PWD=Oracle123 container-registry.oracle.com/database/free:23.5.0.0-lite
+                 docker run -d --name ${{ inputs.version }}-$port --memory=8g --shm-size=4g -p $port:1521 -e ORACLE_PDB=ORCLPDB -e ORACLE_PWD=Oracle123 container-registry.oracle.com/database/free:23.5.0.0-lite
               done
         - if: runner.os == 'Linux' || runner.os == 'macOS'
           name: Verify Oracle Database is running
