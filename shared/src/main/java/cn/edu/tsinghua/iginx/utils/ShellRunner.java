@@ -77,18 +77,13 @@ public class ShellRunner {
   public static void bashEnv() {
     try {
       ProcessBuilder builder = new ProcessBuilder();
-      builder.command("bash", "-c", "which bash"); // 或者使用 "command -v bash"
-
-      // 启动进程
+      builder.command("bash", "-c", "uname -r");
       Process process = builder.start();
-
-      // 读取输出
       BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
       String line;
       while ((line = reader.readLine()) != null) {
         System.out.println("Bash path: " + line);
       }
-
       // 等待进程完成
       int exitCode = process.waitFor();
       System.out.println("Process finished with exit code: " + exitCode);
