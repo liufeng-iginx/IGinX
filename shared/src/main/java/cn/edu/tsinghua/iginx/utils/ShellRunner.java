@@ -48,7 +48,7 @@ public class ShellRunner {
         LOGGER.info("unitTest command is on path {}",isCommandOnPath("bash"));
         builder.command((isCommandOnPath("bash") ? "bash" : BASH_PATH), command);
         LOGGER.info("******************************************************** ");
-        builder.environment();
+        environment = builder.environment();
         environment.forEach((key, value) -> LOGGER.info("{}-{}", key, value));
       } else {
         builder.command(command);
