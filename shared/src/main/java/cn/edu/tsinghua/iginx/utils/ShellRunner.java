@@ -132,7 +132,7 @@ public class ShellRunner {
       // Explicitly set JAVA_HOME in the ProcessBuilder's environment
       environment.put("JAVA_HOME", System.getenv("JAVA_HOME"));  // Use the system's JAVA_HOME
       // Set the PATH to include JAVA_HOME/bin directory
-      environment.put("PATH", environment.get("PATH") + ":" + environment.get("JAVA_HOME") + "/bin");
+      environment.put("PATH", environment.get("PATH") + ";" + environment.get("JAVA_HOME") + "/bin");
     }
   }
 }
