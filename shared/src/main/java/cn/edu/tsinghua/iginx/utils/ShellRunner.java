@@ -38,27 +38,21 @@ public class ShellRunner {
     Process p = null;
     try {
       LOGGER.info("unitTest command {}",command);
+
       ProcessBuilder builder = new ProcessBuilder();
+      Map<String, String> environment = builder.environment();
+      environment.forEach((key, value) -> LOGGER.info("{}-{}", key, value));
+      LOGGER.info("********************************************************");
       if (isOnWin()) {
+        builder = checkEnvForWin(builder);
         LOGGER.info("unitTest command is on path {}",isCommandOnPath("bash"));
         builder.command((isCommandOnPath("bash") ? "bash" : BASH_PATH), command);
+        LOGGER.info("******************************************************** ");
+        builder.environment();
+        environment.forEach((key, value) -> LOGGER.info("{}-{}", key, value));
       } else {
         builder.command(command);
       }
-      // Get the current environment of the ProcessBuilder
-      Map<String, String> environment = builder.environment();
-
-
-      LOGGER.info("unitTest command JAVA_HOME is {}",System.getenv("JAVA_HOME"));
-      LOGGER.info("unitTest command PATH is {}",System.getenv("PATH"));
-      // Explicitly set JAVA_HOME in the ProcessBuilder's environment
-      environment.put("JAVA_HOME", System.getenv("JAVA_HOME"));  // Use the system's JAVA_HOME
-
-      // Set the PATH to include JAVA_HOME/bin directory
-      environment.put("PATH", environment.get("PATH") + ":" + environment.get("JAVA_HOME") + "/bin");
-
-
-
       builder.redirectErrorStream(true);
       p = builder.start();
       BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -118,9 +112,27 @@ public class ShellRunner {
     try {
       Process process = new ProcessBuilder(command, "--version").start();
       int exitCode = process.waitFor();
+      LOGGER.info("******************************************************** {} {}", exitCode, command);
       return exitCode == 0;
     } catch (IOException | InterruptedException e) {
       return false;
+    }
+  }
+
+  /**
+   * 在windows的linux子系统中设置JAVA_HOME环境变量，默认的名称是JAVA_HOME_8_X64
+   */
+  public ProcessBuilder checkEnvForWin(ProcessBuilder builder) {
+    // Get the current environment of the ProcessBuilder
+    Map<String, String> environment = builder.environment();
+    // environment.forEach((key, value) -> LOGGER.info("{}-{}", key, value));
+    if(!environment.containsKey("JAVA_HOME")){
+      LOGGER.info("unitTest command JAVA_HOME is {}",System.getenv("JAVA_HOME"));
+      LOGGER.info("unitTest command PATH is {}",System.getenv("PATH"));
+      // Explicitly set JAVA_HOME in the ProcessBuilder's environment
+      environment.put("JAVA_HOME", System.getenv("JAVA_HOME"));  // Use the system's JAVA_HOME
+      // Set the PATH to include JAVA_HOME/bin directory
+      environment.put("PATH", environment.get("PATH") + ":" + environment.get("JAVA_HOME") + "/bin");
     }
   }
 }
