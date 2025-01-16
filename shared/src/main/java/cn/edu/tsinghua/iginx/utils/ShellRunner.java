@@ -37,20 +37,12 @@ public class ShellRunner {
   public void runShellCommand(String command) throws Exception {
     Process p = null;
     try {
-      LOGGER.info("unitTest command {}",command);
       bashEnv();
       ProcessBuilder builder = new ProcessBuilder();
-      Map<String, String> environment = builder.environment();
-      environment.forEach((key, value) -> LOGGER.info("{}-{}", key, value));
-      LOGGER.info("********************************************************");
       if (isOnWin()) {
-        builder = checkEnvForWin(builder);
-        LOGGER.info("unitTest command is on path {}",isCommandOnPath("bash"));
-//        builder.command((isCommandOnPath("bash") ? "bash" : BASH_PATH), command);
-        builder.command( BASH_PATH, command);
-        LOGGER.info("******************************************************** ");
-        environment = builder.environment();
-        environment.forEach((key, value) -> LOGGER.info("{}-{}", key, value));
+        LOGGER.info("unitTest command is on path bash {}",isCommandOnPath("bash"));
+        LOGGER.info("unitTest command is on path sh {}",isCommandOnPath("sh"));
+        builder.command((isCommandOnPath("sh") ? "sh" : BASH_PATH), command);
       } else {
         builder.command(command);
       }
@@ -131,28 +123,16 @@ public class ShellRunner {
   public static boolean isCommandOnPath(String command) {
     try {
       Process process = new ProcessBuilder(command, "--version").start();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+      String line;
+      while ((line = reader.readLine()) != null) {
+        System.out.println("isCommandOnPath: " + line);
+      }
       int exitCode = process.waitFor();
       LOGGER.info("******************************************************** {} {}", exitCode, command);
       return exitCode == 0;
     } catch (IOException | InterruptedException e) {
       return false;
     }
-  }
-
-  /**
-   * 在windows的linux子系统中设置JAVA_HOME环境变量，默认的名称是JAVA_HOME_8_X64
-   */
-  public ProcessBuilder checkEnvForWin(ProcessBuilder builder) {
-    // Get the current environment of the ProcessBuilder
-    Map<String, String> environment = builder.environment();
-    // environment.forEach((key, value) -> LOGGER.info("{}-{}", key, value));
-    LOGGER.info("unitTest command JAVA_HOME is {}",System.getenv("JAVA_HOME"));
-    LOGGER.info("unitTest command JAVA_HOME is {}",environment.get("JAVA_HOME"));
-    LOGGER.info("unitTest command PATH is {}",System.getenv("PATH"));
-    // Explicitly set JAVA_HOME in the ProcessBuilder's environment
-    environment.put("JAVA_HOME", System.getenv("JAVA_HOME"));  // Use the system's JAVA_HOME
-    // Set the PATH to include JAVA_HOME/bin directory
-    environment.put("PATH", environment.get("PATH") + ";" + environment.get("JAVA_HOME") + "/bin");
-    return builder;
   }
 }
