@@ -19,13 +19,17 @@
  */
 package cn.edu.tsinghua.iginx.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Map;
 
 public class ShellRunner {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(ShellRunner.class);
   // to run .sh script on WindowsOS in github action tests
   // bash.exe path in action windows runners
   public static final String BASH_PATH = "C:/Program Files/Git/bin/bash.exe";
@@ -33,9 +37,19 @@ public class ShellRunner {
   public void runShellCommand(String command) throws Exception {
     Process p = null;
     try {
+      LOGGER.info("unitTest command {}",command);
+      bashEnv();
       ProcessBuilder builder = new ProcessBuilder();
-      if (isOnWin()) {;
+      Map<String, String> environment = builder.environment();
+      environment.forEach((key, value) -> LOGGER.info("{}-{}", key, value));
+      LOGGER.info("********************************************************");
+      if (isOnWin()) {
+        builder = checkEnvForWin(builder);
+        LOGGER.info("unitTest command is on path {}",isCommandOnPath("bash"));
         builder.command((isCommandOnPath("bash") ? "bash" : BASH_PATH), command);
+        LOGGER.info("******************************************************** ");
+        environment = builder.environment();
+        environment.forEach((key, value) -> LOGGER.info("{}-{}", key, value));
       } else {
         builder.command(command);
       }
@@ -59,6 +73,30 @@ public class ShellRunner {
     }
   }
 
+  public static void bashEnv() {
+    try {
+      ProcessBuilder builder = new ProcessBuilder();
+      builder.command("bash", "-c", "which bash"); // 或者使用 "command -v bash"
+
+      // 启动进程
+      Process process = builder.start();
+
+      // 读取输出
+      BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+      String line;
+      while ((line = reader.readLine()) != null) {
+        System.out.println("Bash path: " + line);
+      }
+
+      // 等待进程完成
+      int exitCode = process.waitFor();
+      System.out.println("Process finished with exit code: " + exitCode);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+
   // to directly run command(compare to scripts)
   public static void runCommand(String... command) throws Exception {
     Process p = null;
@@ -77,7 +115,7 @@ public class ShellRunner {
       int i = p.exitValue();
       if (i != 0) {
         throw new Exception(
-            "process exited with value: " + i + "; command: " + Arrays.toString(command));
+                "process exited with value: " + i + "; command: " + Arrays.toString(command));
       }
     } catch (IOException | SecurityException e) {
       throw new Exception("run command failed: " + e.getMessage());
@@ -98,9 +136,27 @@ public class ShellRunner {
     try {
       Process process = new ProcessBuilder(command, "--version").start();
       int exitCode = process.waitFor();
+      LOGGER.info("******************************************************** {} {}", exitCode, command);
       return exitCode == 0;
     } catch (IOException | InterruptedException e) {
       return false;
     }
+  }
+
+  /**
+   * 在windows的linux子系统中设置JAVA_HOME环境变量，默认的名称是JAVA_HOME_8_X64
+   */
+  public ProcessBuilder checkEnvForWin(ProcessBuilder builder) {
+    // Get the current environment of the ProcessBuilder
+    Map<String, String> environment = builder.environment();
+    // environment.forEach((key, value) -> LOGGER.info("{}-{}", key, value));
+    LOGGER.info("unitTest command JAVA_HOME is {}",System.getenv("JAVA_HOME"));
+    LOGGER.info("unitTest command JAVA_HOME is {}",environment.get("JAVA_HOME"));
+    LOGGER.info("unitTest command PATH is {}",System.getenv("PATH"));
+    // Explicitly set JAVA_HOME in the ProcessBuilder's environment
+    environment.put("JAVA_HOME", System.getenv("JAVA_HOME"));  // Use the system's JAVA_HOME
+    // Set the PATH to include JAVA_HOME/bin directory
+    environment.put("PATH", environment.get("PATH") + ";" + environment.get("JAVA_HOME") + "/bin");
+    return builder;
   }
 }
