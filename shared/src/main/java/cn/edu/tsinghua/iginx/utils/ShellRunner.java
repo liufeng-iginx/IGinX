@@ -134,5 +134,6 @@ public class ShellRunner {
       // Set the PATH to include JAVA_HOME/bin directory
       environment.put("PATH", environment.get("PATH") + ";" + environment.get("JAVA_HOME") + "/bin");
     }
+    return builder;
   }
 }
