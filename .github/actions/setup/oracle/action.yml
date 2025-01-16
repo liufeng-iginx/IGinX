@@ -14,7 +14,7 @@ runs:
           shell: bash
           run: |
               sysctl machdep.cpu.brand_string
-              sysct lhw.physicalcpu
+              sysctl hw.physicalcpu
               sysctl hw.logicalcpu
               sysctl hw.memsize
               brew update
