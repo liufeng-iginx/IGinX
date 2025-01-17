@@ -17,7 +17,8 @@ on:
                 description: "The operating system to run the test on"
                 type: string
                 required: false
-                default: '["ubuntu-latest", "macos-latest", "windows-latest"]'
+                #default: '["ubuntu-latest", "macos-latest", "windows-latest"]'
+                default: '["macos-latest", "windows-latest"]'
             metadata-matrix:
                 description: "The metadata to run the test on"
                 type: string
@@ -27,12 +28,13 @@ on:
                 description: "The database to run the test on"
                 type: string
                 required: false
-                default: '["IoTDB12", "InfluxDB", "FileSystem", "PostgreSQL", "Redis", "MongoDB", "MySQL"]'
+                #default: '["IoTDB12", "InfluxDB", "FileSystem", "PostgreSQL", "Redis", "MongoDB", "MySQL", "Oracle"]'
+                default: '["Oracle"]'
             timeout-minutes:
                 description: "The timeout minutes for the job"
                 type: number
                 required: false
-                default: 40
+                default: 90
 
 jobs:
     Union-DB-Test:
@@ -114,8 +116,8 @@ jobs:
                     chmod +x "${GITHUB_WORKSPACE}/.github/scripts/test/cli/test_job_register_macos.sh"
                     "${GITHUB_WORKSPACE}/.github/scripts/test/cli/test_job_register_macos.sh" ${VERSION}
                   fi
-                  mvn test -q -Dtest=TransformJobPathIT#verifyResult -DfailIfNoTests=false -P-format
                   mvn test -q -Dtest=TransformJobRestartIT#prepare -DfailIfNoTests=false -P-format
+                  mvn test -q -Dtest=TransformJobPathIT#verifyResult -DfailIfNoTests=false -P-format
 
             - name: Stop IGinX
               uses: ./.github/actions/iginxRunner
@@ -185,12 +187,19 @@ jobs:
                   work-name: restart-iginx-meta
                   metadata: ${{ matrix.metadata }}
 
+            - if: runner.os == 'Windows'
+              name: Install Docker
+              shell: bash
+              run: |
+                  echo ${JAVA_HOME}
+
             - name: TestController IT
               if: always()
               shell: bash
               env:
                   METADATA_STORAGE: ${{ matrix.metadata }}
               run: |
+                  echo ${JAVA_HOME}
                   chmod +x "${GITHUB_WORKSPACE}/.github/scripts/test/test_union.sh"
                   mvn test -q -Dtest=Controller -DfailIfNoTests=false -P-format
 

@@ -19,13 +19,17 @@
  */
 package cn.edu.tsinghua.iginx.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Map;
 
 public class ShellRunner {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(ShellRunner.class);
   // to run .sh script on WindowsOS in github action tests
   // bash.exe path in action windows runners
   public static final String BASH_PATH = "C:/Program Files/Git/bin/bash.exe";
@@ -33,9 +37,12 @@ public class ShellRunner {
   public void runShellCommand(String command) throws Exception {
     Process p = null;
     try {
+      bashEnv();
       ProcessBuilder builder = new ProcessBuilder();
-      if (isOnWin()) {;
-        builder.command((isCommandOnPath("bash") ? "bash" : BASH_PATH), command);
+      if (isOnWin()) {
+        LOGGER.info("unitTest command is on path bash {}",isCommandOnPath("bash"));
+        LOGGER.info("unitTest command is on path sh {}",isCommandOnPath("sh"));
+        builder.command((isCommandOnPath("sh") ? "sh" : BASH_PATH), command);
       } else {
         builder.command(command);
       }
@@ -58,6 +65,25 @@ public class ShellRunner {
       }
     }
   }
+
+  public static void bashEnv() {
+    try {
+      ProcessBuilder builder = new ProcessBuilder();
+      builder.command("bash", "-c", "uname -r");
+      Process process = builder.start();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+      String line;
+      while ((line = reader.readLine()) != null) {
+        System.out.println("Bash path: " + line);
+      }
+      // 等待进程完成
+      int exitCode = process.waitFor();
+      System.out.println("Process finished with exit code: " + exitCode);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
 
   // to directly run command(compare to scripts)
   public static void runCommand(String... command) throws Exception {
@@ -97,7 +123,13 @@ public class ShellRunner {
   public static boolean isCommandOnPath(String command) {
     try {
       Process process = new ProcessBuilder(command, "--version").start();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+      String line;
+      while ((line = reader.readLine()) != null) {
+        System.out.println("isCommandOnPath: " + line);
+      }
       int exitCode = process.waitFor();
+      LOGGER.info("******************************************************** {} {}", exitCode, command);
       return exitCode == 0;
     } catch (IOException | InterruptedException e) {
       return false;
