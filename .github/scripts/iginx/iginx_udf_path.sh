@@ -39,8 +39,8 @@ else
 
     sh -c "nohup iginx-core-$1/sbin/start_iginx.sh > ../../iginx-u.log 2>&1 &"
 fi
-
-log_file="../../iginx-udf.log"
+echo ${IGINX_HOME}
+log_file="../../iginx-u.log"
 timeout=30
 interval=2
 
