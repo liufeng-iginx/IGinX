@@ -18,7 +18,7 @@ on:
                 type: string
                 required: false
                 #default: '["ubuntu-latest", "macos-latest", "windows-latest"]'
-                default: '["macos-latest"]'
+                default: '["macos-latest", "windows-latest"]'
             metadata-matrix:
                 description: "The metadata to run the test on"
                 type: string
@@ -34,7 +34,7 @@ on:
                 description: "The timeout minutes for the job"
                 type: number
                 required: false
-                default: 60
+                default: 90
 
 jobs:
     Union-DB-Test:
