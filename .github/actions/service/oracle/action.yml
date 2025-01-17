@@ -44,7 +44,7 @@ runs:
           name: Install Docker
           shell: bash
           run: |
-            echo ${JAVA_HOME}
+              echo ${JAVA_HOME}
 
         - if: runner.os == 'Windows'
           name: Start Oracle container
@@ -77,4 +77,4 @@ runs:
           name: Install Docker
           shell: bash
           run: |
-            echo ${JAVA_HOME}
+              echo ${JAVA_HOME}
