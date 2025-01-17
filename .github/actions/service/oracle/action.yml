@@ -30,9 +30,9 @@ runs:
                 while true; do
                   log_output=$(docker logs "${{ inputs.version }}-$port" 2>&1 | grep -i "DATABASE IS READY TO USE" || true)
                   if [ -z "$log_output" ]; then
-                    echo "'XDB initialized' not found in the logs, retrying in 100 seconds..."
+                    echo "oracle service not started, retry in 10 seconds..."
                     docker logs --tail 10 ${{ inputs.version }}-$port
-                    sleep 30
+                    sleep 10
                   else
                     echo "'XDB initialized.' found in the logs, continuing."
                     break
@@ -64,9 +64,9 @@ runs:
                 while true; do
                 log_output=$(docker logs "${{ inputs.version }}-$port" 2>&1 | grep -i "DATABASE IS READY TO USE" || true)
                 if [ -z "$log_output" ]; then
-                  echo "'XDB initialized' not found in the logs, retrying in 100 seconds..."
+                  echo "oracle service not started, retry in 10 seconds..."
                   docker logs --tail 10 ${{ inputs.version }}-$port
-                  sleep 30
+                  sleep 10
                 else
                   echo "'XDB initialized.' found in the logs, continuing."
                   break
